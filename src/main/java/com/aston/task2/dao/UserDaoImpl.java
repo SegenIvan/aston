@@ -11,12 +11,13 @@ import java.util.List;
 
 public class UserDaoImpl implements UserDao{
     @Override
-    public void save(User user) {
+    public User save(User user) {
         Transaction transaction = null;
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             transaction = session.beginTransaction();
             session.save(user);
             transaction.commit();
+            return user;
         } catch (Exception e) {
             if (transaction != null) {
                 transaction.rollback();
@@ -45,12 +46,13 @@ public class UserDaoImpl implements UserDao{
     }
 
     @Override
-    public void update(User user) {
+    public User update(User user) {
         Transaction transaction = null;
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             transaction = session.beginTransaction();
             session.update(user);
             transaction.commit();
+            return user;
         } catch (Exception e) {
             if (transaction != null) {
                 transaction.rollback();
