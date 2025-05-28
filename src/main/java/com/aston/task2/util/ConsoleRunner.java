@@ -1,5 +1,6 @@
 package com.aston.task2.util;
 
+import com.aston.task2.dao.UserDaoImpl;
 import com.aston.task2.entity.User;
 import com.aston.task2.service.UserService;
 import com.aston.task2.service.UserServiceImpl;
@@ -10,7 +11,7 @@ import java.util.Scanner;
 
 @Log4j2
 public class ConsoleRunner {
-    private static final UserService userService = new UserServiceImpl();
+    private static final UserService userService = new UserServiceImpl(new UserDaoImpl());
     private static final Scanner scanner = new Scanner(System.in);
 
     public static void run() {

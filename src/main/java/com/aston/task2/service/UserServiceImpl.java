@@ -7,11 +7,15 @@ import com.aston.task2.entity.User;
 import java.util.List;
 
 public class UserServiceImpl implements UserService{
-    private final UserDao userDao = new UserDaoImpl();
+    private final UserDao userDao;
+
+    public UserServiceImpl(UserDaoImpl userDao) {
+        this.userDao = userDao;
+    }
 
     @Override
-    public void save(User user) {
-        userDao.save(user);
+    public User save(User user) {
+        return userDao.save(user);
     }
 
     @Override
@@ -25,8 +29,8 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public void update(User user) {
-        userDao.update(user);
+    public User update(User user) {
+        return userDao.update(user);
     }
 
     @Override
