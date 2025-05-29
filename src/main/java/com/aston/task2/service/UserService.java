@@ -1,19 +1,19 @@
 package com.aston.task2.service;
 
-import com.aston.task2.entity.User;
+import com.aston.task2.dto.UserDto;
 
 import java.util.List;
 
 public interface UserService {
-    User save(User user);
+    UserDto save(UserDto userDto);
 
-    User findById(Long id);
+    UserDto findById(Long id);
 
-    List<User> findAll();
+    List<UserDto> findAll();
 
-    User update(User user);
+    UserDto update(Long id, UserDto userDto);
 
-    void delete(User user);
+    void delete(Long id);
 
-    User findByEmail(String email);
+    UserDto findByEmail(String email);
 }

@@ -1,45 +1,72 @@
 package com.aston.task2.service;
 
-import com.aston.task2.dao.UserDao;
-import com.aston.task2.dao.UserDaoImpl;
+import com.aston.task2.repository.UserRepository;
+import com.aston.task2.dto.UserDto;
 import com.aston.task2.entity.User;
+import com.aston.task2.exception.UserNotFoundException;
+import com.aston.task2.util.ModelMapper;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
+@Service
+@RequiredArgsConstructor
 public class UserServiceImpl implements UserService{
-    private final UserDao userDao;
 
-    public UserServiceImpl(UserDaoImpl userDao) {
-        this.userDao = userDao;
+    private final UserRepository userRepository;
+    private final ModelMapper modelMapper;
+
+    @Override
+    public UserDto save(UserDto userDto) {
+        User user = modelMapper.getModelMapper().map(userDto, User.class);
+
+        User savedUser = userRepository.save(user);
+
+        return modelMapper.getModelMapper().map(savedUser, UserDto.class);
     }
 
     @Override
-    public User save(User user) {
-        return userDao.save(user);
+    public UserDto findById(Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException("Пользователь не найден"));
+
+        return modelMapper.getModelMapper().map(user, UserDto.class);
     }
 
     @Override
-    public User findById(Long id) {
-        return userDao.findById(id);
+    public List<UserDto> findAll() {
+        return userRepository.findAll().stream()
+                .map(user -> modelMapper.getModelMapper().map(user, UserDto.class))
+                .collect(Collectors.toList());
     }
 
     @Override
-    public List<User> findAll() {
-        return userDao.findAll();
+    public UserDto update(Long id, UserDto userDto) {
+        User excitingUser = userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException("Пользователь не найден" + id));
+
+        modelMapper.getModelMapper().map(userDto, excitingUser);
+
+        User updateUser = userRepository.save(excitingUser);
+
+        return modelMapper.getModelMapper().map(updateUser, UserDto.class);
     }
 
     @Override
-    public User update(User user) {
-        return userDao.update(user);
+    public void delete(Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException("Пользователь не найден"));
+
+        userRepository.delete(user);
     }
 
     @Override
-    public void delete(User user) {
-        userDao.delete(user);
-    }
+    public UserDto findByEmail(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UserNotFoundException("Пользователь не найден"));
 
-    @Override
-    public User findByEmail(String email) {
-        return userDao.findByEmail(email);
+        return modelMapper.getModelMapper().map(user, UserDto.class);
     }
 }
