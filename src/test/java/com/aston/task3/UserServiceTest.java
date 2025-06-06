@@ -22,11 +22,6 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
-
-    @Mock
-    private UserDao userDao;
-
-    @InjectMocks
     private UserServiceImpl userService;
 
     @Mock
@@ -54,7 +49,7 @@ class UserServiceTest {
         assertEquals(30, createdUser.getAge());
 
         verify(userDaoImpl, times(1)).save(any(User.class));
-        verifyNoMoreInteractions(userDao);
+        verifyNoMoreInteractions(userDaoImpl);
     }
 
     @Test

@@ -14,10 +14,10 @@ class UserDaoImplIntegrationTest extends AbstractDaoIntegrationTest {
 
     private UserDao userDao;
 
+
     @BeforeEach
     void setUp() {
         userDao = new UserDaoImpl();
-        userDao.findAll().forEach(userDao::delete);
     }
 
     @Test
