@@ -1,14 +1,13 @@
 package com.aston.task3;
 
-import com.aston.task2.dao.UserDao;
 import com.aston.task2.dao.UserDaoImpl;
 import com.aston.task2.entity.User;
+import com.aston.task2.exception.UserDaoException;
 import com.aston.task2.service.UserServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -53,6 +52,16 @@ class UserServiceTest {
     }
 
     @Test
+    void create_ShouldThrowException_WhenDaoThrowsException() {
+        User user = new User("Name", "valid@email.com", 30);
+        when(userDaoImpl.save(any(User.class))).thenThrow(new UserDaoException("DB error"));
+
+        assertThrows(UserDaoException.class,
+                () -> userService.save(user),
+                "Should propagate DataAccessException from DAO");
+    }
+
+    @Test
     void getUserById() {
         User expectedUser = new User("Test User", "test@example.com", 30);
         expectedUser.setId(1L);
@@ -62,6 +71,15 @@ class UserServiceTest {
 
         assertEquals(expectedUser, actualUser);
         verify(userDaoImpl, times(1)).findById(1L);
+    }
+
+    @Test
+    void findById_ShouldThrowException_WhenDaoThrowsException() {
+        when(userDaoImpl.findById(anyLong())).thenThrow(new UserDaoException("DB error"));
+
+        assertThrows(UserDaoException.class,
+                () -> userService.findById(1L),
+                "Should propagate DataAccessException from DAO");
     }
 
     @Test
@@ -95,6 +113,15 @@ class UserServiceTest {
         userService.delete(existingUser);
 
         verify(userDaoImpl, times(1)).delete(existingUser);
+    }
+
+    @Test
+    void delete_ShouldThrowException_WhenDaoThrowsException() {
+        doThrow(new UserDaoException("DB error")).when(userDaoImpl).delete(any(User.class));
+
+        assertThrows(UserDaoException.class,
+                () -> userService.delete(testUser),
+                "Should propagate DataAccessException from DAO");
     }
 
     @Test
