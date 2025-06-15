@@ -1,5 +1,7 @@
 package com.aston.task2.service;
 
+import com.aston.task2.kafka.EventPublisher;
+import com.aston.task2.kafka.MyEvent;
 import com.aston.task2.repository.UserRepository;
 import com.aston.task2.dto.UserDto;
 import com.aston.task2.entity.User;
@@ -17,12 +19,15 @@ public class UserServiceImpl implements UserService{
 
     private final UserRepository userRepository;
     private final ModelMapper modelMapper;
+    private final EventPublisher eventPublisher;
 
     @Override
     public UserDto save(UserDto userDto) {
         User user = modelMapper.getModelMapper().map(userDto, User.class);
 
         User savedUser = userRepository.save(user);
+
+        eventPublisher.publishUserEvent(new MyEvent("USER_CREATED", savedUser.getEmail()));
 
         return modelMapper.getModelMapper().map(savedUser, UserDto.class);
     }
@@ -58,8 +63,10 @@ public class UserServiceImpl implements UserService{
     public void delete(Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException("Пользователь не найден"));
+        String email = user.getEmail();
 
         userRepository.delete(user);
+        eventPublisher.publishUserEvent(new MyEvent("USER_DELETED", email));
     }
 
     @Override
