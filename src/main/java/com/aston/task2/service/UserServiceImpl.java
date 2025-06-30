@@ -7,6 +7,7 @@ import com.aston.task2.dto.UserDto;
 import com.aston.task2.entity.User;
 import com.aston.task2.exception.UserNotFoundException;
 import com.aston.task2.util.ModelMapper;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -33,6 +34,7 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
+    @CircuitBreaker(name = "userService")
     public UserDto findById(Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException("Пользователь не найден"));
