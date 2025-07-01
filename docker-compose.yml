@@ -16,8 +16,51 @@ services:
       KAFKA_CFG_ADVERTISED_LISTENERS: "PLAINTEXT://localhost:9092"
       KAFKA_CFG_CONTROLLER_QUORUM_VOTERS: "1@kafka:9093"
       ALLOW_PLAINTEXT_LISTENER: "yes"
-    volumes:
-      - kafka_data:/bitnami/kafka
 
-volumes:
-  kafka_data:
+  config-server:
+    build: C:/Users/User/Desktop/config-server
+    ports:
+      - "8888:8888"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+
+  eureka:
+    build: C:/Users/User/Desktop/eureka
+    ports:
+        - "8761:8761"
+    environment:
+        - SPRING_PROFILES_ACTIVE=docker
+    depends_on:
+        - config-server
+
+  aston:
+    build: ./
+    ports:
+        - "8081:8081"
+    environment:
+        - SPRING_PROFILES_ACTIVE=docker
+        - SPRING_CONFIG_URI=http://config-server:8888
+    depends_on:
+        - eureka
+        - kafka
+
+  notification-service:
+    build: C:/Users/User/Desktop/eureka
+    ports:
+        - "8082:8082"
+    environment:
+        - SPRING_PROFILES_ACTIVE=docker
+        - SPRING_CONFIG_URI=http://config-server:8888
+    depends_on:
+        - eureka
+        - kafka
+
+  gateway:
+    build: C:/Users/User/Desktop/gateway
+    ports:
+        - "8080:8080"
+    environment:
+        - SPRING_PROFILES_ACTIVE=docker
+        - SPRING_CONFIG_URI=http://config-server:8888
+    depends_on:
+        - eureka
